@@ -1,8 +1,8 @@
 use std::f32::consts::PI;
 use crate::*;
 
-use module::*;
-mod module;
+use modules::*;
+mod modules;
 
 pub struct Craft {
     pub global_craft_params: CraftParams,
