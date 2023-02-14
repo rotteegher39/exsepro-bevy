@@ -1,6 +1,7 @@
 #![allow(unused)]
 
-use vessel::*;
+use crate::vessel::*;
+
 mod vessel;
 
 fn main() {
