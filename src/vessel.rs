@@ -5,6 +5,7 @@ use {
 };
 
 mod modules;
+pub mod craft_models;
 
 
 
@@ -14,43 +15,63 @@ mod modules;
 // Main Vessel Information
 #[derive(Component, Debug)]
 pub struct Craft {
-    pub param: CraftParams,
+    pub param: CraftInfo,
 }
 #[derive(Debug)]
-pub struct CraftParams {
+pub struct CraftInfo {
     pub craft_name: String,
-    pub craft_model: String,
-    pub craft_type: CraftTypes,
+    pub craft_typemodel: CraftTypes,
 }
 
+pub use craft_models::*;
+
+// Main Vessel Types
 #[derive(Debug)]
-pub enum CraftTypes {
-    Defolt,
-    Chiisai,
-    Chuu,
-    Ooki,
+pub enum CraftTypes
+{
+    Chiisai(Cmods),
+    Chuu(Umods),
+    Ookii(Omods),
 }
 
+// Get default Craft
 impl Default for Craft {
     fn default() -> Self {
         Self { 
-            param: CraftParams {
+            param: CraftInfo {
                 craft_name: "Testos".to_owned(), 
-                craft_model: "ASX001".to_owned(), 
-                craft_type: CraftTypes::Defolt }
+                craft_typemodel: CraftTypes::Chiisai(Cmods::Zabuton) }
         }
     }
 }
 
+// Get Craft by specifying Model and Name
 use CraftTypes::*;
-
-impl Craft {
-    pub fn new(typ: &CraftTypes) -> Self {
+pub trait CraftGet {
+    fn new_def(name: String, typ: CraftTypes) -> Craft {
         match typ {
-            _ | Defolt => Self::default(),
-            Chiisai => todo!(), // add craft model
-            Chuu => todo!(),
-            Ooki => todo!(),
+            _ => Craft::default(),
+            Chiisai(mods) => {
+                Craft {param: CraftInfo {
+                            craft_name: name,
+                            craft_typemodel: CraftTypes::Chiisai(mods),
+                        }}
+            }, // add craft model
+            Chuu(mods) => {
+                Craft {param: CraftInfo {
+                            craft_name: name,
+                            craft_typemodel: CraftTypes::Chuu(mods),
+                        }}
+
+            } 
+            Ookii(mods) => {
+                Craft {param: CraftInfo {
+                            craft_name: name,
+                            craft_typemodel: CraftTypes::Ookii(mods),
+                        }}
+
+            } 
         }
     }
 }
+impl CraftGet for Craft {}
