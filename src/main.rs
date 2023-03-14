@@ -1,9 +1,10 @@
 #![allow(unused)]
-use bevy::{prelude::*, window::{ExitCondition, PresentMode, WindowLevel, WindowMode}};
+use bevy::asset::AssetLoader;
+use bevy::{prelude::*, window::*};
 use std::{process::Command, time::Duration};
 use std::thread::sleep;
 
-use vessel::{Craft, CraftGet, craft_models, CraftTypes::{Chiisai, Chuu}};
+use vessel::{*, CraftTypes::*};
 use crate::craft_models::{Cmods::Zabuton, Umods::Krishna, Omods::*};
 mod vessel;
 
@@ -14,7 +15,7 @@ fn main() {
                 present_mode: PresentMode::AutoVsync,
                 mode: WindowMode::Windowed,
                 title: "Extermination Search Protocol".to_string(),
-                resize_constraints: WindowResizeConstraints { min_width: 200.0, min_height: 200.0, max_width: 500.0, max_height: 300.0 },
+                resize_constraints: WindowResizeConstraints { min_width: 300.0, min_height: 300.0, max_width: 500.0, max_height: 300.0 },
                 resizable: true,
                 decorations: false,
                 transparent: true,
@@ -26,21 +27,57 @@ fn main() {
             close_when_requested: true,
             ..Default::default()
         }))
-        .add_startup_system(setup)
-        .add_system(show)
+        // .add_plugins(DefaultPlugins)
+        .add_startup_system(onset)
+        .add_startup_system(spawn_camera)
+        // .add_system(show)
         .run();
 }
+#[derive(Component)]
+pub struct Player {}
 
-fn setup(mut cmd: Commands) {
-    cmd.spawn(Craft::new_def("ASX-Tester".to_string(), Chiisai(Zabuton)));
-    cmd.spawn(Craft::new_def("USX-Tester".to_string(), Chuu(Krishna)));
+const IMAGE: &str = "sprites/pp.png";
+fn onset(
+    mut cmd: Commands,
+        window_query: Query<&Window, With<PrimaryWindow>>,
+        asset_server: Res<AssetServer>,
+    ) {
+    let window = window_query.get_single().unwrap();
+
+
+    cmd.spawn( 
+        (
+            SpriteBundle {
+                transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
+                texture: asset_server.load(IMAGE),
+                ..default()
+            },
+            Player {}
+        )
+    );
 }
 
-fn show(mut crafts_query: Query<&Craft>) {
+
+fn spawn_camera(
+    mut cmd: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    ) {
+    let window = window_query.get_single().unwrap();
+
+    cmd.spawn(Camera2dBundle {
+        transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
+        ..Default::default()
+    });
+
+
+}
+
+fn show(mut crafts_query: Query<&Craft>, asset_server: Res<AssetServer>) {
     for craft in crafts_query.iter() {
         println!("{craft:#?}");
     }
     sleep(Duration::from_millis(500));
-    Command::new("clear").status().unwrap();
+    Command::new("clear").status().expect("auto clear command didn't work?");
+    println!("{:?}", asset_server.get_load_state(IMAGE))
 }
 
