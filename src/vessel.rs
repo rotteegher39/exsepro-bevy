@@ -46,25 +46,24 @@ impl Default for Craft {
 }
 
 // Get Craft by specifying Model and Name
-use CraftTypes::*;
+use CraftTypes::{Chiisai, Chuu, Ookii};
 pub trait CraftGet {
     fn new_def(name: String, typ: CraftTypes) -> Craft {
         match typ {
-            _ => Craft::default(),
-            Chiisai(mods) => {
+            CraftTypes::Chiisai(mods) => {
                 Craft {param: CraftInfo {
                             craft_name: name,
                             craft_typemodel: CraftTypes::Chiisai(mods),
                         }}
-            }, // add craft model
-            Chuu(mods) => {
+            },
+            CraftTypes::Chuu(mods) => {
                 Craft {param: CraftInfo {
                             craft_name: name,
                             craft_typemodel: CraftTypes::Chuu(mods),
                         }}
 
             } 
-            Ookii(mods) => {
+            CraftTypes::Ookii(mods) => {
                 Craft {param: CraftInfo {
                             craft_name: name,
                             craft_typemodel: CraftTypes::Ookii(mods),

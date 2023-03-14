@@ -1,4 +1,4 @@
-use modparams::*;
+use modparams::{Controlled, Engines, Moving, Room};
 use std::collections::{hash_map, HashMap};
 mod modparams;
 
