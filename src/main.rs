@@ -1,12 +1,17 @@
 #![allow(unused)]
+use bevy::prelude::*;
 
-use crate::vessel::*;
-use crate::vessel::CraftTypes::*;
+use vessel::*;
 mod vessel;
 
 fn main() {
-    let craft1 = Craft::new(Defolt);
-    println!("{:#?}", craft1)
+    App::new()
+        .add_startup_system(setup)
+        .run()
+}
+
+fn setup() {
+    println!("Hello World")
 }
 
 

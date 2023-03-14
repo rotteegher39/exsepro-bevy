@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use bevy::prelude::*;
 
 use {
     modules::*,
@@ -7,10 +7,14 @@ use {
 mod modules;
 
 
+
+
+
+
 // Main Vessel Information
-#[derive(Debug)]
+#[derive(Component, Debug)]
 pub struct Craft {
-    pub global_craft_params: CraftParams,
+    pub param: CraftParams,
 }
 #[derive(Debug)]
 pub struct CraftParams {
@@ -30,7 +34,7 @@ pub enum CraftTypes {
 impl Default for Craft {
     fn default() -> Self {
         Self { 
-            global_craft_params: CraftParams {
+            param: CraftParams {
                 craft_name: "Testos".to_owned(), 
                 craft_model: "ASX001".to_owned(), 
                 craft_type: CraftTypes::Defolt }
@@ -38,15 +42,13 @@ impl Default for Craft {
     }
 }
 
-use crate::vessel::CraftTypes::*;
+use CraftTypes::*;
 
 impl Craft {
-    pub fn new(typ: CraftTypes) -> Craft {
+    pub fn new(typ: &CraftTypes) -> Self {
         match typ {
-            Defolt => Craft::default(),
-            _ => Craft::default(),
-
-            Chiisai => todo!(),
+            _ | Defolt => Self::default(),
+            Chiisai => todo!(), // add craft model
             Chuu => todo!(),
             Ooki => todo!(),
         }
