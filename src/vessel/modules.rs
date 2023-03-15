@@ -1,10 +1,9 @@
 use modparams::{Controlled, Engines, Moving, Room};
-use std::collections::{hash_map, HashMap};
 mod modparams;
 
 pub struct CraftModules {
-    moving: HashMap<Moving, u8>,
-    controlled: HashMap<Controlled, u8>,
-    engines: HashMap<Engines, u8>,
-    room: HashMap<Room, u8>,
+    moving: Vec<Moving>,
+    controlled: Vec<Controlled>,
+    engines: Vec<Engines>,
+    room: Vec<Room>,
 }
