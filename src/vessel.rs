@@ -75,14 +75,14 @@ pub fn spawncrafts(
     asset_server: Res<AssetServer>,
 ) {
     let window = window_query.get_single().unwrap();
-    let scale: f32 = 0.05;
+    let scale: f32 = 0.15;
 
     cmd.spawn((
         Craft::new_def("CSX001".to_string(), Chiisai(Zabuton)),
         SpriteBundle {
             transform: Transform {
                 translation: vec3(0.0, 0.0, 0.0),
-                rotation: Quat::from_xyzw(0.0, 0.0, 0.0, 0.0),
+                rotation: Quat::from_xyzw(0.0, 0.0, 0.0, 1.0),
                 scale: vec3(scale, scale, scale),
             },
             texture: asset_server.load(IMAGE),

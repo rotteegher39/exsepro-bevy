@@ -36,6 +36,8 @@ fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWind
 }
 
 pub const SPEED: f32 = 250.0;
+pub const ANGLE_SPEED: f32 = 0.01;
+
 
 fn get_input(
     keyin: Res<Input<KeyCode>>,
@@ -43,23 +45,73 @@ fn get_input(
     time: Res<Time>,
     ) {
     if let Ok(mut trnsf) = craft_trnsf.get_single_mut() {
+        let mut p_up: bool = keyin.pressed(KeyCode::Up);
+        let mut p_left: bool = keyin.pressed(KeyCode::Left);
+        let mut p_down: bool = keyin.pressed(KeyCode::Down);
+        let mut p_right: bool = keyin.pressed(KeyCode::Right);
+
+        let mut p_x: bool = keyin.pressed(KeyCode::X);
+        let mut p_y: bool = keyin.pressed(KeyCode::Y);
+        let mut p_z: bool = keyin.pressed(KeyCode::Z);
+        let mut p_w: bool = keyin.pressed(KeyCode::W);
+
+        let mut p_xs: bool = keyin.pressed(KeyCode::Space) && keyin.pressed(KeyCode::X);
+        let mut p_ys: bool = keyin.pressed(KeyCode::Space) && keyin.pressed(KeyCode::Y);
+        let mut p_zs: bool = keyin.pressed(KeyCode::Space) && keyin.pressed(KeyCode::Z);
+        let mut p_ws: bool = keyin.pressed(KeyCode::Space) && keyin.pressed(KeyCode::W);
+        
+        let mut reset: bool = keyin.pressed(KeyCode::Space) && keyin.pressed(KeyCode::R);
+
         let mut direction = Vec3::ZERO;
 
-        if keyin.pressed(KeyCode::H) {
-           direction += vec3(-1.0, 0.0, 0.0) 
-        }
-        if keyin.pressed(KeyCode::J) {
-           direction += vec3(0.0, -1.0, 0.0) 
-        }
-        if keyin.pressed(KeyCode::K) {
-           direction += vec3(0.0, 1.0, 0.0) 
-        }
-        if keyin.pressed(KeyCode::L) {
-           direction += vec3(1.0, 0.0, 0.0) 
-        }
+
+
+        // WASD
+            if p_up {
+               direction += vec3(0.0, 1.0, 0.0) 
+            }
+            if p_left {
+               direction += vec3(-1.0, 0.0, 0.0) 
+            }
+            if p_down {
+               direction += vec3(0.0, -1.0, 0.0) 
+            }
+            if p_right {
+               direction += vec3(1.0, 0.0, 0.0) 
+            }
 
         if direction.length() > 0.0 {
             direction = direction.normalize();
+        }
+
+        // XYZW
+        if p_xs {
+            trnsf.rotate_x(-ANGLE_SPEED);
+        } else {
+            if p_x {
+                trnsf.rotate_x(ANGLE_SPEED);
+            }
+        }
+        if p_ys {
+            trnsf.rotate_y(-ANGLE_SPEED);
+        } else {
+            if p_y {
+                trnsf.rotate_y(ANGLE_SPEED);
+            }
+        }
+        if p_zs {
+            trnsf.rotate_z(-ANGLE_SPEED);
+        } else {
+            if p_z {
+                trnsf.rotate_z(ANGLE_SPEED);
+            }
+        }
+        if p_ws {
+            trnsf.rotation.w += -ANGLE_SPEED;
+        } else {
+            if p_w {
+                trnsf.rotation.w += ANGLE_SPEED;
+            }
         }
 
         trnsf.translation += direction * SPEED * time.delta_seconds();
@@ -67,7 +119,11 @@ fn get_input(
 }
 
 // Query info for All Crafts
-fn info(craft_q: Query<&Craft, With<Craft>>, asset_server: Res<AssetServer>) {
+fn info(
+    craft_q: Query<&Craft, With<Craft>>,
+    craft_trnsf: Query<&Transform, With<Craft>>,
+    asset_server: Res<AssetServer>
+    ) {
     Command::new("clear")
         .status()
         .expect("constant auto clear command didn't work?");
@@ -75,5 +131,16 @@ fn info(craft_q: Query<&Craft, With<Craft>>, asset_server: Res<AssetServer>) {
     for craft in craft_q.iter() {
         println!("{craft:#?}");
     }
+    for craft in craft_trnsf.iter() {
+        println!("{craft:#?}");
+    }
     println!("Sprite {:?}", asset_server.get_load_state(IMAGE))
+}
+
+// Confile Movement of Craft on edges
+fn confine_edges(
+    mut craft_trnsf: Query<&mut Transform, With<Craft>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    ) {
+
 }
