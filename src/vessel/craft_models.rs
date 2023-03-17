@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub enum Cmods {
     Zabuton,
-    Kil,
+    Kiff,
     Fillet,
     Typhon,
 }
@@ -11,13 +11,15 @@ pub enum Umods {
     Krishna,
     Orion,
     Pegasus,
-    Echidna
+    Echidna,
+    Suki,
+    Monad,
 }
 
 #[derive(Debug)]
 pub enum Omods{
     Stati,
     Stratus,
-    Monad,
     Aether,
+    Liubyt,
 }

@@ -1,94 +1,79 @@
 #![allow(unused)]
+use std::any::TypeId;
+use bevy::app::PluginGroupBuilder;
+use bevy::input::keyboard;
 use bevy::math::vec3;
 use bevy::{prelude::*, window::*};
-use std::{process::Command, time::Duration};
-use std::thread::sleep;
+use std::process::Command;
 
-use vessel::{*, CraftTypes::*};
-use crate::craft_models::{Cmods::*, Umods::*, Omods::*};
+use crate::craft_models::{Cmods::*, Omods::*, Umods::*};
+use vessel::{CraftTypes::*, *};
 mod vessel;
+mod winconf;
 
+use winconf::get_window;
 fn main() {
+
     App::new()
-        // Window Parameters
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-
-            primary_window: Some(Window {
-                
-                present_mode: PresentMode::AutoVsync,
-                mode: WindowMode::Windowed,
-                title: "Extermination Search Protocol".to_string(),
-                resize_constraints: WindowResizeConstraints { min_width: 300.0, min_height: 300.0, max_width: 500.0, max_height: 300.0 },
-                resizable: true,
-                decorations: false,
-                transparent: false,
-                focused: false,
-                window_level: WindowLevel::AlwaysOnTop,
-                ..Default::default()
-            }),
-
-            exit_condition: ExitCondition::OnAllClosed,
-            close_when_requested: true,
-            ..Default::default()
-        }))
-        // .add_plugins(DefaultPlugins)
-        .add_startup_system(onset)
+        // Parameters to setup WINDOW
+        .add_plugins(winconf::get_window())
+        // startup
+        .add_startup_system(vessel::spawncrafts)
         .add_startup_system(spawn_camera)
+
+        .add_system(get_input)
         .add_system(info)
         .run();
 }
 
-// Player sprite
-const IMAGE: &str = "sprites/craft.png";
-
-fn onset(
-    mut cmd: Commands,
-        window_query: Query<&Window, With<PrimaryWindow>>,
-        asset_server: Res<AssetServer>,
-    ) {
+fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
-
-
-    cmd.spawn( 
-        (
-            SpriteBundle {
-                transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
-                texture: asset_server.load(IMAGE),
-                ..default()
-            },
-            Craft::new_def("CSX001".to_string(), Chiisai(Zabuton)),
-        )
-    );
-}
-
-fn spawn_camera(
-    mut cmd: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    ) {
-    let window = window_query.get_single().unwrap();
-    let scale: f32 = 20 as f32;
 
     cmd.spawn(Camera2dBundle {
-        transform: Transform {
-            translation: vec3(window.height() / 2.0, window.width() / 2.0, 0.0),
-            rotation: Quat::from_xyzw(0.0, 0.0, 0.0, 0.0),
-            scale: vec3(scale, scale, scale),
-        },
+        // transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
         ..Default::default()
     });
-
-
 }
 
-fn info(
-        craft_q: Query<&Craft>,
-        asset_server: Res<AssetServer>
-    )
-{
-    Command::new("clear").status().expect("constant auto clear command didn't work?");
+pub const SPEED: f32 = 250.0;
+
+fn get_input(
+    keyin: Res<Input<KeyCode>>,
+    mut craft_trnsf: Query<&mut Transform, With<Craft>>,
+    time: Res<Time>,
+    ) {
+    if let Ok(mut trnsf) = craft_trnsf.get_single_mut() {
+        let mut direction = Vec3::ZERO;
+
+        if keyin.pressed(KeyCode::H) {
+           direction += vec3(-1.0, 0.0, 0.0) 
+        }
+        if keyin.pressed(KeyCode::J) {
+           direction += vec3(0.0, -1.0, 0.0) 
+        }
+        if keyin.pressed(KeyCode::K) {
+           direction += vec3(0.0, 1.0, 0.0) 
+        }
+        if keyin.pressed(KeyCode::L) {
+           direction += vec3(1.0, 0.0, 0.0) 
+        }
+
+        if direction.length() > 0.0 {
+            direction = direction.normalize();
+        }
+
+        trnsf.translation += direction * SPEED * time.delta_seconds();
+    } 
+}
+
+// Query info for All Crafts
+fn info(craft_q: Query<&Craft, With<Craft>>, asset_server: Res<AssetServer>) {
+    Command::new("clear")
+        .status()
+        .expect("constant auto clear command didn't work?");
+
     for craft in craft_q.iter() {
         println!("{craft:#?}");
     }
-    println!("{:?}", asset_server.get_load_state(IMAGE))
+    println!("Sprite {:?}", asset_server.get_load_state(IMAGE))
 }
-
