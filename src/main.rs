@@ -8,8 +8,8 @@ use std::process::Command;
 
 use crate::craft_models::{Cmods::*, Omods::*, Umods::*};
 use vessel::{CraftTypes::*, *};
-mod vessel;
-mod winconf;
+pub mod vessel;
+pub mod winconf;
 
 use winconf::get_window;
 fn main() {
@@ -135,12 +135,4 @@ fn info(
         println!("{craft:#?}");
     }
     println!("Sprite {:?}", asset_server.get_load_state(IMAGE))
-}
-
-// Confile Movement of Craft on edges
-fn confine_edges(
-    mut craft_trnsf: Query<&mut Transform, With<Craft>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    ) {
-
 }
