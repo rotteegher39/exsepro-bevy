@@ -1,3 +1,10 @@
+use super::modules::*;
+
+#[derive(Debug)]
+pub struct CraftModel{
+    pub modules: CraftModules
+}
+
 #[derive(Debug)]
 pub enum CraftTypes {
     Small(Smodls),
@@ -28,26 +35,9 @@ pub enum Bmodls {
     Stati,
     Stratus,
     Aether,
-    Liubyt,
+    Liubytk,
 }
 
-// Useless code, refactor later to something useful
-pub trait CraftTypesModelInterface<ANYMODEL> {
-    fn get_model(typ: ANYMODEL) -> CraftTypes;
-}
-
-impl CraftTypesModelInterface<Smodls> for Smodls {
-    fn get_model(typ: Smodls) -> CraftTypes {
-        CraftTypes::Small(typ)
-    }
-}
-impl CraftTypesModelInterface<Mmodls> for Mmodls {
-    fn get_model(typ: Mmodls) -> CraftTypes {
-        CraftTypes::Medium(typ)
-    }
-}
-impl CraftTypesModelInterface<Bmodls> for Bmodls {
-    fn get_model(typ: Bmodls) -> CraftTypes {
-        CraftTypes::Big(typ)
-    }
+pub trait CraftypesModelInterface<ANYMODEL> {
+    fn fetch_modelinfo(typ: ANYMODEL) -> CraftModel;
 }
