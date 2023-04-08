@@ -12,16 +12,16 @@ use vessel::*;
 pub mod vessel;
 pub mod winconf;
 
-use winconf::get_window;
+use winconf::*;
 fn main() {
     App::new()
         // Parameters to setup WINDOW
-        .add_plugins(winconf::get_window())
+        .add_plugins(winconf::get_window(winconf::load_window_settings("window_config.ron")))
         // startup
         .add_startup_system(spawn_camera)
         .add_startup_system(spawncrafts)
         // Print Debug info
-        .add_system(info)
+        // .add_system(info)
         .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
         .run();
 }
