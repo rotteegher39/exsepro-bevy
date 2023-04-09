@@ -5,6 +5,7 @@ use bevy::ecs::query::WorldQuery;
 use bevy::input::keyboard;
 use bevy::math::vec3;
 use bevy::{prelude::*, window::*};
+use bevy::log::LogPlugin;
 use std::process::Command;
 
 use vessel::craft_models::{*, Bmodls::*, Mmodls::*, Smodls::*};
@@ -16,7 +17,8 @@ use winconf::*;
 fn main() {
     App::new()
         // Parameters to setup WINDOW
-        .add_plugins(winconf::get_window(winconf::load_window_settings("window_config.ron")))
+        .add_plugin(LogPlugin::default())
+        .add_plugins(set_window())
         // startup
         .add_startup_system(spawn_camera)
         .add_startup_system(spawncrafts)
@@ -28,20 +30,17 @@ fn main() {
 // Get Camera working
 fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
-
     cmd.spawn(Camera3dBundle {
         transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
         ..Default::default()
     });
 }
-
 // Spawn Crafts with easy interface of name and model.
-// Craft:: new_define fetches info about model & get's an instance
+// Craft::new_define() fetches info about model&name and returns Craft instance
 // of Craft with specified model
 pub fn spawncrafts(
     mut cmd: Commands,
 ) {
-    
     cmd.spawn(
             Craft::new_define("CSX001".to_string(), Zabuton),
     );
@@ -50,9 +49,6 @@ pub fn spawncrafts(
     );
 }
 
-fn info_all_entities(
-) {
-}
 
 // Query info for All Crafts
 fn info(
@@ -64,11 +60,9 @@ fn info(
         .status()
         .expect("constant auto clear command didn't work?");
     for craft in craft_q.iter() {
-        println!("{craft:#?}");
+        info!("{craft:#?}");
     }
     for camera in camera_trnsf.iter() {
-        println!("{camera:#?}")
+        info!("{camera:#?}")
     }
-
-
 }
