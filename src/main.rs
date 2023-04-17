@@ -11,15 +11,17 @@ use std::process::Command;
 use vessel::craft_models::{*, Bmodls::*, Mmodls::*, Smodls::*};
 use vessel::*;
 pub mod vessel;
-pub mod winconf;
+pub mod conf;
 
-use winconf::*;
+// The Project builder. AKA "App"
 fn main() {
     App::new()
-        // Parameters to setup WINDOW
-        .add_plugin(LogPlugin::default())
-        .add_plugins(set_window())
-        // startup
+        // init logging system cause it's disabled in init_window_and_defaultplugins()
+        // MUST be first in the APP to work
+        .add_plugin(LogPlugin::default())   
+        // Parameters to setup DefaultPlugins with WINDOW from window_config.ron 
+        .add_plugins(conf::init_window_and_defaultplugins())
+        // startup testings
         .add_startup_system(spawn_camera)
         .add_startup_system(spawncrafts)
         // Print Debug info
@@ -27,14 +29,14 @@ fn main() {
         .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
         .run();
 }
-// Get Camera working
+// Get Camera working. No camera - no display.
 fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
     cmd.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(window.height() / 2.0, window.width() / 2.0, 0.0),
+        transform: Transform::IDENTITY, // at position 0
         ..Default::default()
     });
-}
+} 
 // Spawn Crafts with easy interface of name and model.
 // Craft::new_define() fetches info about model&name and returns Craft instance
 // of Craft with specified model
