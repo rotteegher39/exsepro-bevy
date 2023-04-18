@@ -20,7 +20,7 @@ fn main() {
         // MUST be first in the APP to work
         .add_plugin(LogPlugin::default())   
         // Parameters to setup DefaultPlugins with WINDOW from window_config.ron 
-        .add_plugins(conf::init_window_and_defaultplugins())
+        .add_plugins(conf::window_config::init_window_and_defaultplugins())
         // startup testings
         .add_startup_system(spawn_camera)
         .add_startup_system(spawncrafts)
@@ -29,6 +29,7 @@ fn main() {
         .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
         .run();
 }
+
 // Get Camera working. No camera - no display.
 fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
