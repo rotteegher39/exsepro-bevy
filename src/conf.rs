@@ -1,15 +1,20 @@
 use std::fs::File;
-use std::path::Path;
-use std::io::{BufReader, Read, BufRead};
-use serde::{Deserialize, Serialize};
-use serde::de::{DeserializeOwned, Error};
-use ron::de::*;
+use std::path::{Path, PathBuf};
+use std::io::Read;
+use serde::Serialize;
+use serde::de::DeserializeOwned;
+use ron::de::from_str;
 use ron::ser::*;
 
 use bevy::ecs::system::*;
 use bevy::prelude::*;
 
 pub mod window_config;
+
+// DEBUG:
+    // Input false to is_root_path to keep directory structure when cargo build
+    // Input true when cargo build --release to package exec binary
+pub const IS_ROOT_PATH: bool = false;
 
 // Serializes and Deserializes contained type 'Containant' -> into/from a RON file (which is an any configurable type inside a Wrapper that is implemented by this trait).
     // Example:
@@ -24,7 +29,22 @@ pub trait Container: Sized {
     fn get_containant_from(wrapper: Self::Wrapper) -> Self::Containant;
 
     // Function to fetch configuration from a file and deserialize it
-    fn fetch_containant(path: &str) -> Self::Containant {
+    fn fetch_containant(path: &str, is_root_path: bool) -> Self::Containant {
+        // Get path buffer of the executable for packaging purposes
+        let mut path_buf = PathBuf::new();
+        // DEBUG:
+            // Input false to is_root_path to keep directory structure when compiling debug with cargo build
+            // Input true when cargo build --release to package exec binary
+        // Get relative to executable path to work 
+        if is_root_path {
+            path_buf.push(std::env::current_exe().unwrap().parent().unwrap());
+        } else { warn!("Using non relative to executable path!!! FOR DEBUG ONLY! Intended to be used with cargo");}
+        // Push input relative path
+        path_buf.push(path);
+
+        // Shadow path with Unwraped to &str PathBuf
+        let path: &str = path_buf.to_str().unwrap();
+
         // Get mutable default containant constructor from default Wrapper
         let mut containant_constructor = Self::get_containant_from(Self::Wrapper::default());
         // Create folder at 'path' if doesn't exist.
@@ -32,7 +52,7 @@ pub trait Container: Sized {
             if !parent_dir.exists() {
                 match std::fs::create_dir_all(parent_dir) {
                     Ok(()) => { warn!("Directory at path {:?} does not exist. Creating new ones RECURSIVELY...", parent_dir); },
-                    Err(err) => { panic!("Failed to create directory at path '{:?}'. Error: {err}", parent_dir);},
+                    Err(err) => { error!("Failed to create directory at path '{:?}'. Error: {err}", parent_dir);},
                 }
             }
         }
@@ -51,6 +71,7 @@ pub trait Container: Sized {
             }
         } 
     }
+
     // Serialize constructor to the file at 'path'. Wrapper::default().0 is used as constructor by default.
     fn serialize_constructor(path: &str, containant_constructor: &Self::Containant) -> () {
         // Type name of Containant
@@ -81,7 +102,7 @@ pub trait Container: Sized {
         let constructor_name = std::any::type_name::<Self::Containant>();
 
         let mut file_contents = String::new();
-        opened_file.read_to_string(&mut file_contents);
+        opened_file.read_to_string(&mut file_contents); 
         // Try to deserialize whole file and mutate the containant_constructor to return it with changed values to those of ron_str
         *containant_constructor = match ron::de::from_str(&file_contents){
             Ok(deserialized) => { 

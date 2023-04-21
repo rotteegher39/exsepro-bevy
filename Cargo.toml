@@ -16,8 +16,11 @@ opt-level = 3
 [profile.release]
 lto = "thin"
 
-[dependencies]
-bevy = { version = "0.10.0", features = ["dynamic_linking", "serialize"] }
+[dependencies] 
+# Important to have dynamic_linking DISABLED when packaging --release for external execution
+bevy = { version = "0.10.0", features = ["serialize"] }
+# Important to have dynamic_linking ENABLED for faster recompilations
+# bevy = { version = "0.10.0", features = ["dynamic_linking", "serialize"] }
 bevy-inspector-egui = "0.18.1"
 ron = "0.8.0"
 serde = { version = "1.0.159", features = ["derive"]}

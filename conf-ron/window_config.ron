@@ -15,7 +15,7 @@
         scale_factor_override: Some(0.85),
         scale_factor: 1.0,
     ),
-    title: "Extermination Search Protocol",
+    title: "External Search Protocol",
     composite_alpha_mode: Auto,
     resize_constraints: (
         min_width: 300.0,
