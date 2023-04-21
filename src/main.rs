@@ -1,12 +1,13 @@
 #![allow(unused)]
-use std::any::TypeId;
+use std::process::Command;
+
 use bevy::app::PluginGroupBuilder;
 use bevy::ecs::query::WorldQuery;
 use bevy::input::keyboard;
 use bevy::math::vec3;
 use bevy::{prelude::*, window::*};
 use bevy::log::LogPlugin;
-use std::process::Command;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use vessel::craft_models::{*, Bmodls::*, Mmodls::*, Smodls::*};
 use vessel::*;
@@ -19,11 +20,17 @@ fn main() {
         // init logging system cause it's disabled in init_window_and_defaultplugins()
         // MUST be first in the APP to work
         .add_plugin(LogPlugin::default())   
-        // Parameters to setup DefaultPlugins with WINDOW from window_config.ron 
-        .add_plugins(conf::window_config::init_window_and_defaultplugins())
-        // startup testings
+        // Parameters to setup DefaultPlugins with set Window from window_config.ron 
+        .add_plugins(conf::window_config::set_window_and_defaultplugins())
+        .add_plugin(WorldInspectorPlugin::new())
+        // camera
         .add_startup_system(spawn_camera)
+        // startup testings
         .add_startup_system(spawncrafts)
+        .register_type::<Craft>()
+        .register_type::<Smodls>()
+        .register_type::<Mmodls>()
+        .register_type::<Bmodls>()
         // Print Debug info
         // .add_system(info)
         .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
@@ -39,16 +46,16 @@ fn spawn_camera(mut cmd: Commands, window_query: Query<&Window, With<PrimaryWind
     });
 } 
 // Spawn Crafts with easy interface of name and model.
-// Craft::new_define() fetches info about model&name and returns Craft instance
+// Craft::new_define() fetches info about model&name and returns Craft component instance
 // of Craft with specified model
 pub fn spawncrafts(
     mut cmd: Commands,
 ) {
     cmd.spawn(
-            Craft::new_define("CSX001".to_string(), Zabuton),
+        Craft::new_define("CSX001".to_string(), Zabuton),
     );
     cmd.spawn(
-            Craft::new_define("CSX002".to_string(), Pliashka),
+        Craft::new_define("CSX002".to_string(), Pliashka),
     );
 }
 

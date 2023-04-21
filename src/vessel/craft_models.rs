@@ -1,18 +1,24 @@
 use super::modules::*;
+use bevy::{reflect::*, prelude::ReflectDefault};
 
 #[derive(Debug)]
 pub struct CraftModel{
     pub modules: CraftModules
 }
 
-#[derive(Debug)]
+#[derive(Debug, Reflect, FromReflect)]
+#[reflect(with = "bevy::reflect::ReflectDefault")]
 pub enum CraftTypes {
     Small(Smodls),
     Medium(Mmodls),
     Big(Bmodls),
 }
-#[derive(Debug)]
+
+
+#[derive(Default, Debug, Reflect, FromReflect)]
+#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
 pub enum Smodls {
+    #[default]
     Zabuton,
     Kiff,
     Fillet,
@@ -20,22 +26,26 @@ pub enum Smodls {
     Pliashka,
 }
 
-#[derive(Debug)]
+#[derive(Default, Debug, Reflect, FromReflect)]
+#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
 pub enum Mmodls {
+    #[default]
+    Suki,
     Krishna,
     Orion,
     Pegasus,
     Echidna,
-    Suki,
     Monad,
 }
 
-#[derive(Debug)]
+#[derive(Default, Debug, Reflect, FromReflect)]
+#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
 pub enum Bmodls {
+    #[default]
+    Liubyt,
     Stati,
     Stratus,
     Aether,
-    Liubytk,
 }
 
 pub trait CraftypesModelInterface<ANYMODEL> {

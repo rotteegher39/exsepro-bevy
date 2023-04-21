@@ -12,7 +12,7 @@
     resolution: (
         physical_width: 1280,
         physical_height: 720,
-        scale_factor_override: None,
+        scale_factor_override: Some(0.85),
         scale_factor: 1.0,
     ),
     title: "Extermination Search Protocol",
@@ -30,7 +30,7 @@
     window_level: AlwaysOnTop,
     canvas: None,
     fit_canvas_to_parent: false,
-    prevent_default_event_handling: true,
+    prevent_default_event_handling: false,
     internal: (
         minimize_request: None,
         maximize_request: None,

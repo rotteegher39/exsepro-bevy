@@ -1,68 +1,24 @@
-use std::borrow::BorrowMut;
 use std::fs::File;
 use std::path::Path;
 use std::io::{BufReader, Read, BufRead};
-use bevy::ecs::query::WorldQuery;
 use serde::{Deserialize, Serialize};
 use serde::de::{DeserializeOwned, Error};
 use ron::de::*;
 use ron::ser::*;
-use ron::Value;
+
 use bevy::ecs::system::*;
-
-use bevy::app::PluginGroupBuilder;
-use bevy::asset::LoadState;
 use bevy::prelude::*;
-use bevy::window::*;
-use bevy::log::LogPlugin;
-
-
-// Setting the Default for WindowConfig (wrapper config struct for Window struct type)
-#[derive(Resource)]
-pub struct WindowConfig(Window);
-
-impl Container for WindowConfig {
-    type Wrapper = WindowConfig;
-    type Containant = Window;
-    fn get_containant_from(wrapper: WindowConfig) -> Window {
-        wrapper.0
-    }
-}
-
-impl Default for WindowConfig {
-    fn default() -> Self {
-        WindowConfig(
-            Window {
-                present_mode: PresentMode::AutoVsync,
-                mode: WindowMode::Windowed,
-                title: "Extermination Search Protocol".to_string(),
-                resize_constraints: WindowResizeConstraints {
-                    min_width: 300.0,
-                    min_height: 300.0,
-                    max_width: 500.0,
-                    max_height: 300.0,
-                },
-                resizable: true,
-                decorations: true,
-                transparent: false,
-                focused: true,
-                window_level: WindowLevel::AlwaysOnTop,
-                ..Default::default()
-            }
-        )
-    }
-}
 
 pub mod window_config;
 
-// Saves and Fetches contained type 'Containant' -> into/from a file (which is an any configurable type inside a wrapper that is implemented by this trait).
+// Serializes and Deserializes contained type 'Containant' -> into/from a RON file (which is an any configurable type inside a Wrapper that is implemented by this trait).
     // Example:
-    // struct WindowConfig(Window) - which is a Wrapper
-    // struct Window - which is a contained configrable type (Containant) that is saved/fetched into/from config file.
+        // struct WindowConfig(Window) - which is a Wrapper for Window struct
+        // struct Window - which is a Containant - configrable type that is saved/fetched into/from config RON file. Which is contained inside WindowConfig struct.
 pub trait Container: Sized {
-    // wrapper
+    // Wrapper that contains 'Containant'
     type Wrapper: Default;
-    // Type that is returned from a fetch. (Contained value of Wrapper)
+    // Type that is returned from a fetch. (Type that contained inside Wrapper)
     type Containant: Default + Serialize + DeserializeOwned;
     // Specify how to get Containant from Wrapper
     fn get_containant_from(wrapper: Self::Wrapper) -> Self::Containant;
@@ -90,12 +46,13 @@ pub trait Container: Sized {
             Err(err) => {
                 warn!("Failed to open/read '{}' file -> REPLACING WITH DEFAULTS. Error: {}", path, err);
                 // Serialize Self::Wrapper::default().0 in this Err(err) arm
-                Self::serialize_constructor(path, containant_constructor)
+                Self::serialize_constructor(path, &containant_constructor);
+                return containant_constructor
             }
         } 
     }
-    // Serialize defaults to the file at 'path'
-    fn serialize_constructor(path: &str, containant_constructor: Self::Containant) -> Self::Containant {
+    // Serialize constructor to the file at 'path'. Wrapper::default().0 is used as constructor by default.
+    fn serialize_constructor(path: &str, containant_constructor: &Self::Containant) -> () {
         // Type name of Containant
         let containant_name = std::any::type_name::<Self::Containant>();
         // Create folder at 'path' if doesn't exist.
@@ -118,8 +75,6 @@ pub trait Container: Sized {
         )
             .unwrap_or_else(|err| panic!("Failed to write default() config to '{}' file: {}", path, err));
         warn!("File '{}' written/replaced with defaults, returning initial {} expression", path, containant_name);
-        return containant_constructor;
-
     }
     // Deserializes the file and tries to mutate each field of constructor and returns the result
     fn deserialize_mut_constructor(mut opened_file: File, containant_constructor: &mut Self::Containant) -> () {
@@ -130,7 +85,7 @@ pub trait Container: Sized {
         // Try to deserialize whole file and mutate the containant_constructor to return it with changed values to those of ron_str
         *containant_constructor = match ron::de::from_str(&file_contents){
             Ok(deserialized) => { 
-                info!("{} opened successfully", constructor_name);
+                info!("Deserialized {} loaded successfully", constructor_name);
                 deserialized 
             },
             Err(err) => {
