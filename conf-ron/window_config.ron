@@ -6,7 +6,7 @@
         hit_test: true,
         physical_position: None,
     ),
-    present_mode: AutoVsync,
+    present_mode: AutoNoVsync,
     mode: Windowed,
     position: Automatic,
     resolution: (

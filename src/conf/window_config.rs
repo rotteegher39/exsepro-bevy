@@ -1,6 +1,6 @@
 use super::*;
 use bevy::log::LogPlugin;
-use bevy::app::PluginGroupBuilder;
+use bevy::app::Plugin;
 use bevy::window::*;
 
 
@@ -19,7 +19,7 @@ impl Container for WindowConfig {
 impl Default for WindowConfig {
     fn default() -> Self {
         WindowConfig(Window {
-            present_mode: PresentMode::AutoVsync,
+            present_mode: PresentMode::AutoNoVsync,
             mode: WindowMode::Windowed,
             title: "External Search Protocol".to_string(),
             resize_constraints: WindowResizeConstraints {
@@ -52,13 +52,10 @@ pub const WINCONF_PATH: &str = "conf-ron/window_config.ron";
 
 // Adds DefaultPlugins and sets Window from fetch_winconfig().
 // Should always work, even if config file did not load, it should load default()
-pub fn set_window_and_defaultplugins() -> PluginGroupBuilder {
-
-    DefaultPlugins
-        .set(WindowPlugin { // put true when compiling with --relase
-            primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH, IS_ROOT_PATH)), // put false when building debug
-            exit_condition: ExitCondition::OnAllClosed,
-            close_when_requested: true,
-        })
-        .disable::<LogPlugin>()
+pub fn set_windowplugin() -> WindowPlugin {
+            WindowPlugin {                                                        // put true when compiling with --relase
+                primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH, IS_ROOT_PATH)), // put false when building debug
+                exit_condition: ExitCondition::OnAllClosed,
+                close_when_requested: true,
+            }
 }

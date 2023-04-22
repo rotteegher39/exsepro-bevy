@@ -38,7 +38,7 @@ pub trait Container: Sized {
         // Get relative to executable path to work 
         if is_root_path {
             path_buf.push(std::env::current_exe().unwrap().parent().unwrap());
-        } else { warn!("Using non relative to executable path!!! FOR DEBUG ONLY! Intended to be used with cargo");}
+        } else { warn!("Using non relative to executable path!!! FOR DEBUG ONLY! Intended to be used with 'cargo run' ");}
         // Push input relative path
         path_buf.push(path);
 

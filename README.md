@@ -1,2 +1,2 @@
-# exsepro-bevy
-Just me learing Rust by creating a game with Bevy.
+# External Search Protocol or exsepro-bevy
+Just me learning Rust by creating a game with Bevy.
