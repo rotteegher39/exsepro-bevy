@@ -7,6 +7,7 @@ use debug::*;
 pub mod vessel;
 pub mod debug;
 pub mod conf;
+pub mod assets;
 
 // The Project builder. AKA "App"
 fn main() {
@@ -17,12 +18,18 @@ fn main() {
         .add_plugins(DefaultPlugins.build()
             .disable::<WindowPlugin>()
         )
+
+
+
         // Diagnostics
         .add_plugin(DebugInfoPlugin)
+
+
+    
         // camera
         .add_startup_system(spawn_camera)
         // Make between frames rendering color when nothing is rendered 
-        .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
+        .insert_resource(ClearColor(Color::NONE))
 
         // Crafts
         .add_plugin(CraftPlugin)

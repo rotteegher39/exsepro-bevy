@@ -11,7 +11,7 @@ pub struct WindowConfig(Window);
 impl Container for WindowConfig {
     type Wrapper = WindowConfig;
     type Containant = Window;
-    fn get_containant_from(wrapper: WindowConfig) -> Window {
+    fn unwrap_containant_from(wrapper: WindowConfig) -> Window {
         wrapper.0
     }
 }
@@ -25,8 +25,8 @@ impl Default for WindowConfig {
             resize_constraints: WindowResizeConstraints {
                 min_width: 300.0,
                 min_height: 300.0,
-                max_width: 500.0,
-                max_height: 300.0,
+                max_width: 960.0,
+                max_height: 720.0,
             },
             resolution: WindowResolution::default().with_scale_factor_override(0.85),
             resizable: true,
@@ -54,7 +54,7 @@ pub const WINCONF_PATH: &str = "conf-ron/window_config.ron";
 // Should always work, even if config file did not load, it should load default()
 pub fn set_windowplugin() -> WindowPlugin {
             WindowPlugin {                                                        // put true when compiling with --relase
-                primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH, IS_ROOT_PATH)), // put false when building debug
+                primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH)), // put false when building debug
                 exit_condition: ExitCondition::OnAllClosed,
                 close_when_requested: true,
             }

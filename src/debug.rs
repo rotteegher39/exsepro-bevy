@@ -7,6 +7,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::text::TextPlugin;
 
 use super::vessel::*;
+use super::conf::*;
 
 pub struct DebugInfoPlugin;
 
@@ -23,9 +24,22 @@ impl Plugin for DebugInfoPlugin {
                 }
             )
             .add_plugin(FrameTimeDiagnosticsPlugin::default())
-            // Make between frames rendering color when nothing is rendered 
-            .insert_resource(ClearColor(Color::MIDNIGHT_BLUE))
+            .add_startup_system(info)
             ;
+    }
+}
+pub struct Hello(String);
+impl Default for Hello {
+    fn default() -> Self {
+        Hello("default".to_string())
+    }
+}
+
+impl Container for Hello {
+    type Wrapper = Hello;
+    type Containant = String;
+    fn unwrap_containant_from(wrapper: Hello) -> String {
+        wrapper.0
     }
 }
 // Query info for All Crafts
@@ -34,13 +48,15 @@ fn info(
     camera_trnsf: Query<&mut Transform>,
     asset_server: Res<AssetServer>,
 ) {
-    Command::new("clear")
-        .status()
-        .expect("constant auto clear command didn't work?");
-    for craft in craft_q.iter() {
-        info!("{craft:#?}");
-    }
-    for camera in camera_trnsf.iter() {
-        info!("{camera:#?}")
-    }
+    let some_string = "Hello World!".to_string();
+    Hello::serialize_constructor("test1/test2/hello.ron", &some_string)
+    // Command::new("clear")
+    //     .status()
+    //     .expect("constant auto clear command didn't work?");
+    // for craft in craft_q.iter() {
+    //     info!("{craft:#?}");
+    // }
+    // for camera in camera_trnsf.iter() {
+    //     info!("{camera:#?}")
+    // }
 }

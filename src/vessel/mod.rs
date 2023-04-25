@@ -27,7 +27,7 @@ impl Plugin for CraftPlugin {
 // of Craft with specified model
 pub fn spawncrafts(mut cmd: Commands) {
     cmd.spawn(Craft::new_define("CSX001".to_string(), Zabuton));
-    cmd.spawn(Craft::new_define("CSX002".to_string(), Pliashka));
+    cmd.spawn(Craft::new_define("CSX002".to_string(), Suki));
 }
 
 // Main Instance Vessel Information
@@ -37,8 +37,8 @@ pub struct Craft {
     // pub craft_modelinfo: CraftModel,
 }
 
-// Get Craft with easy interface of name and model.
-// Fetches info about model from ...]TODO[!...
+// Get Craft with easy interface of any name and model.
+// Fetches info about model from !!! ...] TODO [... !!! Probably from fetch_containant() deserialization...
 pub trait CraftInterface<ANYMODEL> {
     fn new_define(name: String, typ: ANYMODEL) -> (Name, Craft);
 }
@@ -48,6 +48,28 @@ impl CraftInterface<Smodls> for Craft {
             Name::new(name),
             Craft {
                 craft_typemodel: CraftTypes::Small(typ),
+                // craft_modelinfo: Default::default()
+            },
+        )
+    }
+}
+impl CraftInterface<Mmodls> for Craft {
+    fn new_define(name: String, typ: Mmodls) -> (Name, Craft) {
+        (
+            Name::new(name),
+            Craft {
+                craft_typemodel: CraftTypes::Medium(typ),
+                // craft_modelinfo: Default::default()
+            },
+        )
+    }
+}
+impl CraftInterface<Bmodls> for Craft {
+    fn new_define(name: String, typ: Bmodls) -> (Name, Craft) {
+        (
+            Name::new(name),
+            Craft {
+                craft_typemodel: CraftTypes::Big(typ),
                 // craft_modelinfo: Default::default()
             },
         )
