@@ -1,7 +1,6 @@
 use super::*;
-use bevy::log::LogPlugin;
-use bevy::app::Plugin;
 use bevy::window::*;
+
 
 
 // Setting the Default for WindowConfig (wrapper config struct for Window struct type)
@@ -53,8 +52,8 @@ pub const WINCONF_PATH: &str = "conf-ron/window_config.ron";
 // Adds DefaultPlugins and sets Window from fetch_winconfig().
 // Should always work, even if config file did not load, it should load default()
 pub fn set_windowplugin() -> WindowPlugin {
-            WindowPlugin {                                                        // put true when compiling with --relase
-                primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH)), // put false when building debug
+            WindowPlugin {
+                primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH)),
                 exit_condition: ExitCondition::OnAllClosed,
                 close_when_requested: true,
             }

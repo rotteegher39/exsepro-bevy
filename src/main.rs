@@ -1,24 +1,25 @@
-#![allow(unused)]
+// #![allow(unused)]
 
 use bevy::{prelude::*, window::*};
+use bevy::log::LogPlugin;
 
 use vessel::*;
 use debug::*;
 pub mod vessel;
 pub mod debug;
 pub mod conf;
-pub mod assets;
 
 // The Project builder. AKA "App"
 fn main() {
     App::new()
+        .add_plugin(LogPlugin::default())
         // Setup WindowPlugin with fetched settings from window_settings.ron
         .add_plugin(conf::window_config::set_windowplugin())
         // DefaultPlugins
         .add_plugins(DefaultPlugins.build()
             .disable::<WindowPlugin>()
+            .disable::<LogPlugin>()
         )
-
 
 
         // Diagnostics
@@ -29,7 +30,7 @@ fn main() {
         // camera
         .add_startup_system(spawn_camera)
         // Make between frames rendering color when nothing is rendered 
-        .insert_resource(ClearColor(Color::NONE))
+        .insert_resource(ClearColor(Color::TEAL))
 
         // Crafts
         .add_plugin(CraftPlugin)
