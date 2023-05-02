@@ -156,7 +156,7 @@ pub trait Container: Sized {
         // Input false to is_not_debug to keep dir structure at package root when running cargo run
         // Input true when cargo run --release to keep dir structure relative to exec binary
         // Get or not get relative to executable path.
-        if !debug_path {
+        if debug_path {
             path_buf.push(std::env::current_exe()
                 .expect("Couldn't get path for current executable")
                 .parent()

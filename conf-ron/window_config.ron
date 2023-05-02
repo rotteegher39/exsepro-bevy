@@ -12,7 +12,7 @@
     resolution: (
         physical_width: 1280,
         physical_height: 720,
-        scale_factor_override: Some(0.85),
+        scale_factor_override: Some(1.00),
         scale_factor: 1.0,
     ),
     title: "External Search Protocol",

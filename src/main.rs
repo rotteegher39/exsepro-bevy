@@ -1,4 +1,4 @@
-// #![allow(unused)]
+#![allow(unused)]
 
 use bevy::{prelude::*, window::*};
 use bevy::log::LogPlugin;
@@ -28,7 +28,11 @@ fn main() {
 
     
         // camera
-        .add_startup_system(spawn_camera)
+        // .add_startup_system(spawn_camera)
+
+
+
+
         // Make between frames rendering color when nothing is rendered 
         .insert_resource(ClearColor(Color::TEAL))
 
