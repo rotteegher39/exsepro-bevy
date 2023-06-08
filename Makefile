@@ -7,4 +7,6 @@ build:
 pack:
 	cargo build --release
 
+run_rel:
+	cargo run --release
 

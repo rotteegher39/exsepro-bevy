@@ -25,11 +25,8 @@ fn main() {
         // Diagnostics
         .add_plugin(DebugInfoPlugin)
 
-
-    
         // camera
         // .add_startup_system(spawn_camera)
-
 
 
 

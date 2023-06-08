@@ -18,47 +18,49 @@ pub const DEBUG_PATH: bool = false;
 #[cfg(not(debug_assertions))]
 pub const DEBUG_PATH: bool = true;
 
+/// Serializes and deserializes a contained type, `Containant`, into/from a RON file.
+///
+/// # Example:
+/// - `ExampleWindowConfig`: A wrapper type for the `Window` struct.
+/// - `Window`: The configurable type that is saved/fetched into/from a RON file at a specific path,
+///   which is contained inside the example `WindowConfig` struct.
 /// ```rust,no_run
-/// Serializes and Deserializes contained type Containant -> into/from a RON file
-            /// (which is an any configurable type inside a Wrapper that is implemented by this trait).
-/// Showcase:
-            /// struct WindowConfig(Window) - which is a type Wrapper for Window struct
-            /// struct Window - which is a type Containant - configrable type that we want to be saved/fetched into/from RON file at specific path.
-                /// (which is contained inside WindowConfig struct).
-/// Example:
-                    /// pub struct WindowConfig(Window);
-                    ///
-                    /// impl Container for WindowConfig {
-                    ///     type Wrapper = WindowConfig;
-                    ///     type Containant = Window;
-                    ///
-                    /// // We need this function for wrapper -> containant logic.
-                    ///     fn unwrap_containant_from(wrapper: WindowConfig) -> Window {
-                    ///         wrapper.0
-                    ///     }
-                    /// }
-                    ///
-                    /// // Get unique defaults of Containant for every different type that impl Container trait.
-                    /// // In this case this type is WindowConfig struct.
-                    /// impl Default for WindowConfig {
-                    ///     fn default() -> Self {
-                    ///         WindowConfig(
-                    ///              Window {...}
-                    ///         )
-                    /// }
-                    ///
-                    /// // Sets Window struct from fetch_winconfig(path: &str).
-                    /// // Should always work, even if RON file could be loaded, default() will be used instead 
-                    /// pub fn set_windowplugin() -> WindowPlugin {
-                    ///             WindowPlugin {
-                    ///                 primary_window: Some(WindowConfig::fetch_containant(WINCONF_PATH)),
-                    ///                 exit_condition: ExitCondition::OnAllClosed,
-                    ///                 close_when_requested: true,
-                    ///             }
-                    /// }
-                    /// 
-                    ///
-                    ///
+/// pub struct WindowConfig(Window);
+///
+/// impl Container for WindowConfig {
+///     type Wrapper = WindowConfig;
+///     type Containant = Window;
+///
+///     // Unwraps the `Containant` from the `Wrapper`.
+///     fn unwrap_containant_from(wrapper: WindowConfig) -> Window {
+///         wrapper.0
+///     }
+/// }
+///
+/// // Provides unique defaults for `Containant` for each different type that implements the `Container` trait.
+/// impl Default for WindowConfig {
+///     fn default() -> Self {
+///         WindowConfig(Window { /* unique defaults */ })
+///     }
+/// }
+///
+/// impl Default for OtherWindowConfig {
+///     fn default() -> Self {
+///         OtherWindowConfig(Window { /* unique defaults */ })
+///     }
+/// }
+///
+/// // Loads the `Window` struct from the RON file at the specified path.
+/// // If the file cannot be loaded, `default()` will be used and serialized instead.
+/// pub fn load_window() -> Window {
+///     WindowConfig::fetch_containant("path/to/windowconfig.ron")
+/// }
+///
+/// // Fetches exampleconfig.ron from parsed `path`
+/// fetch_containant(path: &str)
+/// - `path` is relative to executable when compiling with --release
+/// - cargo run by default makes `path` relative to the project's top directory.
+/// - otherwise `path` is relative to current execution `pwd` directory. 
 /// ```
 pub trait Container: Sized {
     /// Wrapper that contains 'Containant'
