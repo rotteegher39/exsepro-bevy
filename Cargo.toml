@@ -1,7 +1,11 @@
 [package]
-name = "exsepro-bevy"
+name = "exobendlim-bevy"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "exobendlim"
+path = "src/exobendlim.rs"
 
 [workspace]
 resolver = "2" # Important! wgpu/Bevy needs this!
