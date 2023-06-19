@@ -1,2 +1,2 @@
-# Exo Bend Limit or exobendlim-bevy
-Just me learning Rust by creating a game with Bevy.
+# Exosphere Bend Limit or exobendlim-bevy
+Just me exploring Rust by hacking into [Bevy](https://github.com/bevyengine/bevy).

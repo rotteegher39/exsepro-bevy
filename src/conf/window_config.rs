@@ -20,7 +20,7 @@ impl Default for WindowConfig {
         WindowConfig(Window {
             present_mode: PresentMode::AutoNoVsync,
             mode: WindowMode::Windowed,
-            title: "Exo Bend Limit".to_string(),
+            title: "Exosphere Bend Limit".to_string(),
             resize_constraints: WindowResizeConstraints {
                 min_width: 300.0,
                 min_height: 300.0,

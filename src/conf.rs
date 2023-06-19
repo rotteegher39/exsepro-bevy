@@ -14,7 +14,7 @@ pub mod window_config;
 #[cfg(debug_assertions)]
 pub const DEBUG_PATH: bool = false;
 
-/// Debug force de/ser path to be relatie to executable file root dir when running binary itself.
+/// Debug force de/ser path to be relative to executable file root dir when running binary itself.
 #[cfg(not(debug_assertions))]
 pub const DEBUG_PATH: bool = true;
 
@@ -67,7 +67,7 @@ pub trait Container: Sized {
     type Wrapper: Default;
     /// Type that is returned from a fetch. (Type that contained inside Wrapper)
     type Containant: Default + Serialize + DeserializeOwned;
-    /// Specify how to get Containant from WrSpper
+    /// Specify how to get Containant from Wrapper
     fn unwrap_containant_from(wrapper: Self::Wrapper) -> Self::Containant;
 
     /// Function to fetch configuration from a file and deserialize Wrapper::default() if does not exist
