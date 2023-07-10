@@ -6,8 +6,7 @@ pub struct CraftModel{
     pub modules: CraftModules
 }
 
-#[derive(Debug, Reflect, FromReflect)]
-#[reflect(with = "bevy::reflect::ReflectDefault")]
+#[derive(Debug, Reflect)]
 pub enum CraftTypes {
     Small(Smodls),
     Medium(Mmodls),
@@ -15,8 +14,8 @@ pub enum CraftTypes {
 }
 
 
-#[derive(Default, Debug, Reflect, FromReflect)]
-#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
+#[derive(Default, Debug, Reflect)]
+#[reflect(Default)]
 pub enum Smodls {
     #[default]
     Zabuton,
@@ -26,8 +25,8 @@ pub enum Smodls {
     Pliashka,
 }
 
-#[derive(Default, Debug, Reflect, FromReflect)]
-#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
+#[derive(Default, Debug, Reflect)]
+#[reflect(Default)]
 pub enum Mmodls {
     #[default]
     Suki,
@@ -38,8 +37,8 @@ pub enum Mmodls {
     Monad,
 }
 
-#[derive(Default, Debug, Reflect, FromReflect)]
-#[reflect(Default, with = "bevy::reflect::ReflectDefault")]
+#[derive(Default, Debug, Reflect)]
+#[reflect(Default)]
 pub enum Bmodls {
     #[default]
     Liubyt,

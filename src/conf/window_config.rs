@@ -42,6 +42,7 @@ impl Default for WindowConfig {
             internal: InternalWindowState::default(),
             ime_enabled: false,
             ime_position: Vec2::default(),
+            window_theme: Some(WindowTheme::Dark)
         })
     }
 }

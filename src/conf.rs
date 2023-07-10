@@ -4,19 +4,21 @@ use std::io::Read;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use ron::ser::*;
+use bevy::log::*;
 
 use bevy::ecs::system::*;
 use bevy::prelude::*;
 
 pub mod window_config;
 
+
 /// Debug force de/serializing path to be package root dir when working with cargo.
 #[cfg(debug_assertions)]
-pub const DEBUG_PATH: bool = false;
+pub const NO_DEBUG_PATH: bool = false;
 
 /// Debug force de/ser path to be relative to executable file root dir when running binary itself.
 #[cfg(not(debug_assertions))]
-pub const DEBUG_PATH: bool = true;
+pub const NO_DEBUG_PATH: bool = true;
 
 /// Serializes and deserializes a contained type, `Containant`, into/from a RON file.
 ///
@@ -67,21 +69,21 @@ pub trait Container: Sized {
     type Wrapper: Default;
     /// Type that is returned from a fetch. (Type that contained inside Wrapper)
     type Containant: Default + Serialize + DeserializeOwned;
-    /// Specify how to get Containant from Wrapper
+    /// Specify how to get Containant from WrSpper
     fn unwrap_containant_from(wrapper: Self::Wrapper) -> Self::Containant;
 
     /// Function to fetch configuration from a file and deserialize Wrapper::default() if does not exist
     fn fetch_containant(path: &str) -> Self::Containant {
 
-        // Get mutable default containant constructor from default Wrapper
-        // Uses default() values of Wrapper. Separete from Containant itself.
-            // To be not confused with Containant::default().
+        // Get mutable default containant constructor from default Wrapper values.
+        // Uses default() values of Wrapper. Separete from Containant::default() itself.
+            // Not to be confused with Containant::default().
         let mut containant_constructor = Self::unwrap_containant_from(Self::Wrapper::default());
 
         // Try to open the config File and parse it
         match File::open(
             // funciton to check if path is available.
-            Self::check_path(path, DEBUG_PATH).to_str().unwrap()
+            Self::check_path(path, NO_DEBUG_PATH).to_str().unwrap()
         ) {
             // Try to deserialize opened file into RON.
             Ok(opened_file) => {
@@ -92,7 +94,7 @@ pub trait Container: Sized {
             Err(err) => {
                 warn!("Failed to open/read file at '{}' REPLACING IT WITH DEFAULTS. Error: {}", path, err);
                 // Serialize Self::Wrapper::default().0 in this Err(err) arm
-                Self::serialize_constructor(path, &containant_constructor);
+                Self::serialize_constructor(path, &containant_constructor, PrettyConfig::default());
                 return containant_constructor
             }
         } 
@@ -100,19 +102,19 @@ pub trait Container: Sized {
 
     /// Serialize constructor to the RON file at 'path'. Wrapper::default() is usually used by default.
     /// any other constructor can be passed in to serialize different from default() custom values.
-    fn serialize_constructor(path: &str, containant_constructor: &Self::Containant) -> () {
+    fn serialize_constructor(path: &str, containant_constructor: &Self::Containant, pretty_config: PrettyConfig) {
         // type_name of containant for debug messages
         let containant_name = std::any::type_name::<Self::Containant>();
 
         // Get to check path
-        let check = Self::check_path(path, DEBUG_PATH);
+        let check = Self::check_path(path, NO_DEBUG_PATH);
         let path: &str = check.to_str().unwrap();
         // Write RON file at checked 'path'
         match std::fs::write(
             path,
             ron::ser::to_string_pretty(
                 &containant_constructor,
-                PrettyConfig::default(),
+                pretty_config,
             )
                 .unwrap_or_else(|err| panic!("Failed to serialize/write default() config to '{}' file. \n How the hell did that happen??? -> Error: {}", path, err)),
         ) {
@@ -124,7 +126,7 @@ pub trait Container: Sized {
     /// Mutates each field of passed in constructor_containant accordingly to file_contents.
         /// If could not be deserialized, then leaves returns passed in containant_constructor unchanged.
     /// For now only tries to deserialize the whole file. If failes just returns the error and default()
-    fn deserialize_mut_constructor(mut opened_file: File, containant_constructor: &mut Self::Containant) -> () {
+    fn deserialize_mut_constructor(mut opened_file: File, containant_constructor: &mut Self::Containant) {
         // type_name of constructor for debug messages
         let constructor_name = std::any::type_name::<Self::Containant>();
 
@@ -149,8 +151,8 @@ pub trait Container: Sized {
     }
 
     /// Checks if path is available, if not creates folders.
-    /// DEBUG_PATH=false used for debug when using cargo run
-    /// DEBUG_PATH=true used when cargo run --release
+    /// NO_DEBUG_PATH=false used for debug when using cargo run
+    /// NO_DEBUG_PATH=true used when cargo run --release
     fn check_path(path: &str, debug_path: bool) -> PathBuf {
         // Get path buffer of the executable for packaging purposes
         let mut path_buf = PathBuf::new();
@@ -165,7 +167,7 @@ pub trait Container: Sized {
                 .expect("Couldn't get parent for current executable path. HOW? IMPOSSIBLE! Shouldn't have happened!"));
             info!("Using relative to executable path. All ok...")
         } else {
-            warn!("Using non relative to executable path!!! FOR DEBUG ONLY!!! Intended to be used with 'cargo run' when DEBUG_PATH = false. ");
+            warn!("Using non relative to executable path!!! FOR DEBUG ONLY!!! Intended to be used with 'cargo run' when NO_DEBUG_PATH = false. ");
             path_buf.push(
                 std::env::current_dir()
                     .expect("Couldn't get path for current working directory")

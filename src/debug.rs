@@ -1,13 +1,14 @@
 use std::process::Command;
 use std::time::Duration;
 
+use bevy::diagnostic::{Diagnostic, DiagnosticsStore};
+use bevy::ecs::schedule::ScheduleLabel;
 use bevy::utils::Instant;
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin, Diagnostics},
     prelude::*,
 };
 use bevy::transform::commands;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use super::vessel::*;
 use super::conf::*;
@@ -18,7 +19,6 @@ pub struct DebugInfoPlugin;
 impl Plugin for DebugInfoPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_plugin(WorldInspectorPlugin::new())
             // .add_plugin(
             //     LogDiagnosticsPlugin {
             //         debug: false,
@@ -26,11 +26,11 @@ impl Plugin for DebugInfoPlugin {
             //         filter: None,
             //     }
             // )
-            .add_plugin(FrameTimeDiagnosticsPlugin::default())
+            // .add_plugin(FrameTimeDiagnosticsPlugin::default())
             //
             // .add_startup_system(craft_info)
-            .add_startup_system(setup_debug)
-            .add_system(fps)
+            // .add_systems(Startup, setup_debug)
+            .add_systems(Update, fps)
             ;
     }
 }
@@ -43,8 +43,12 @@ fn setup_debug(
     asset_server: Res<AssetServer>,
     mut cmd: Commands,
 ) {
+    // THIS CAUSES wgpu error: Validation Error . runtime crash
+    // idk why
+
     // UI camera
-    cmd.spawn(Camera2dBundle::default());
+    // cmd.spawn(Camera2dBundle::new_with_far(0.1));
+     
     // Text with one section
     cmd.spawn((
         // Create a TextBundle that has a Text with a single section.
@@ -77,11 +81,6 @@ fn setup_debug(
         // Set the style of the TextBundle itself.
         .with_style(Style {
             position_type: PositionType::Absolute,
-            position: UiRect {
-                top: Val::Px(5.0),
-                right: Val::Px(15.0),
-                ..default()
-            },
             ..default()
         }),
         FpsText,
@@ -90,7 +89,7 @@ fn setup_debug(
 
 
 fn fps(
-    diagnostics: Res<Diagnostics>,
+    diagnostics: Res<DiagnosticsStore>,
     mut query: Query<&mut Text, With<FpsText>>,
     mut last_update_time: Local<Option<Instant>>,
 ) {

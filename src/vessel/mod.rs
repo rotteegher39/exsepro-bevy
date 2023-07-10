@@ -13,7 +13,7 @@ pub struct CraftPlugin;
 impl Plugin for CraftPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_startup_system(spawncrafts)
+            .add_systems(Update, spawncrafts)
             .register_type::<Craft>()
             .register_type::<Smodls>()
             .register_type::<Mmodls>()

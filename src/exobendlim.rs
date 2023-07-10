@@ -12,9 +12,9 @@ pub mod conf;
 // The Project builder. AKA "App"
 fn main() {
     App::new()
-        .add_plugin(LogPlugin::default())
+        .add_plugins(LogPlugin::default())
         // Setup WindowPlugin with fetched settings from window_settings.ron
-        .add_plugin(conf::window_config::set_windowplugin())
+        .add_plugins(conf::window_config::set_windowplugin())
         // DefaultPlugins
         .add_plugins(DefaultPlugins.build()
             .disable::<WindowPlugin>()
@@ -23,10 +23,10 @@ fn main() {
 
 
         // Diagnostics
-        .add_plugin(DebugInfoPlugin)
+        .add_plugins(DebugInfoPlugin)
 
         // camera
-        // .add_startup_system(spawn_camera)
+        .add_systems(Startup, spawn_camera)
 
 
 
@@ -34,7 +34,7 @@ fn main() {
         .insert_resource(ClearColor(Color::TEAL))
 
         // Crafts
-        .add_plugin(CraftPlugin)
+        // .add_plugins(CraftPlugin)
         .run();
 }
 
